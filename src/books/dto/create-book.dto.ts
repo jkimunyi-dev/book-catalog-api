@@ -1,31 +1,19 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsNumber,
-  IsISBN,
-  Min,
-  Max,
-  Length,
-} from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
 
 export class CreateBookDto {
-  @IsString()
   @IsNotEmpty()
-  @Length(1, 255)
+  @IsString()
   title: string;
 
-  @IsString()
   @IsNotEmpty()
-  @Length(1, 255)
+  @IsString()
   author: string;
 
+  @IsNotEmpty()
   @IsNumber()
-  @Min(1000)
-  @Max(new Date().getFullYear() + 10)
   publicationYear: number;
 
-  @IsString()
   @IsNotEmpty()
-  @IsISBN()
+  @IsString()
   isbn: string;
 }
