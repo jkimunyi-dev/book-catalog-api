@@ -20,7 +20,14 @@ import { SearchBooksDto } from './dto/search-books.dto';
 import { Book, BookCountByYear } from './interfaces/book.interface';
 
 @Controller('books')
-@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+@UsePipes(
+  new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: false,
+    skipMissingProperties: false,
+  }),
+)
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
@@ -31,12 +38,17 @@ export class BooksController {
     message: string;
     data: Book;
   }> {
+    console.log('Received book data:', createBookDto); // Add logging to debug
+
     const bookInput = {
       title: createBookDto.title,
       author: createBookDto.author,
       publication_year: createBookDto.publicationYear,
       isbn: createBookDto.isbn,
     };
+
+    console.log('Transformed book input:', bookInput); // Add logging to debug
+
     const book = await this.booksService.create(bookInput);
     return {
       statusCode: HttpStatus.CREATED,
