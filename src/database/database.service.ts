@@ -20,23 +20,19 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private pool: Pool;
 
   constructor() {
-    const config: DatabaseConfig = {
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      username: process.env.DB_USERNAME || 'book_catalog_user',
-      password: process.env.DB_PASSWORD || 'book_catalog_user',
-      database: process.env.DB_NAME || 'book_catalog',
-    };
+    const connectionString =
+      process.env.DATABASE_URL ||
+      'postgresql://demodb_owner:npg_8WsIJV1zLwdD@ep-damp-sea-a8qnzghk-pooler.eastus2.azure.neon.tech/demodb?sslmode=require';
 
     this.pool = new Pool({
-      host: config.host,
-      port: config.port,
-      user: config.username,
-      password: config.password,
-      database: config.database,
-      max: 20, // Maximum number of clients in the pool
-      idleTimeoutMillis: 30000, // How long a client is allowed to remain idle
-      connectionTimeoutMillis: 2000, // How long to wait for a connection
+      connectionString,
+      ssl: {
+        rejectUnauthorized: true,
+      },
+      max: 10, // Reduced from 20 to avoid overwhelming the connection
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000, // Increased from 2000 to allow more time for connection
+      keepAlive: true, // Add keepalive to maintain connection
     });
 
     // Handle pool errors
@@ -46,19 +42,38 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit(): Promise<void> {
-    try {
-      // Test the connection
-      const client = await this.pool.connect();
-      await client.query('SELECT NOW()');
-      client.release();
+    const maxRetries = 3;
+    let retries = 0;
 
-      this.logger.log('Database connection established successfully');
+    while (retries < maxRetries) {
+      try {
+        // Test the connection
+        const client = await this.pool.connect();
+        await client.query('SELECT NOW()');
+        client.release();
 
-      // Initialize database schema
-      await this.initializeSchema();
-    } catch (error) {
-      this.logger.error('Failed to connect to database', error);
-      throw error;
+        this.logger.log('Database connection established successfully');
+
+        // Initialize database schema
+        await this.initializeSchema();
+        return; // Exit the function if successful
+      } catch (error) {
+        retries++;
+        this.logger.warn(
+          `Failed to connect to database (attempt ${retries}/${maxRetries})`,
+        );
+
+        if (retries >= maxRetries) {
+          this.logger.error(
+            'Failed to connect to database after multiple attempts',
+            error,
+          );
+          throw error;
+        }
+
+        // Wait before retrying (exponential backoff)
+        await new Promise((resolve) => setTimeout(resolve, 1000 * retries));
+      }
     }
   }
 

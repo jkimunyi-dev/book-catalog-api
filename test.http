@@ -1,0 +1,196 @@
+### Test the root endpoint
+GET http://localhost:3000
+Accept: application/json
+
+### 1. Get all books (no parameters)
+GET http://localhost:3000/books
+Accept: application/json
+
+### 2. Get all books with pagination
+GET http://localhost:3000/books?limit=5&offset=0
+Accept: application/json
+
+### 3. Get books by title
+GET http://localhost:3000/books?title=River
+Accept: application/json
+
+### 4. Get books by author
+GET http://localhost:3000/books?author=Ngugi
+Accept: application/json
+
+### 5. Get books by publication year
+GET http://localhost:3000/books?publication_year=2006
+Accept: application/json
+
+### 1. Get book by ID = 1
+GET http://localhost:3000/books/1
+Accept: application/json
+
+### 2. Get book by ID = 2
+GET http://localhost:3000/books/2
+Accept: application/json
+
+### 3. Get book by ID = 3
+GET http://localhost:3000/books/3
+Accept: application/json
+
+### 4. Get book by ID = 4
+GET http://localhost:3000/books/4
+Accept: application/json
+
+### 5. Get book by ID = 5
+GET http://localhost:3000/books/5
+Accept: application/json
+
+### 1. Add a book
+POST http://localhost:3000/books
+Content-Type: application/json
+
+{
+  "title": "River and the Source",
+  "author": "Margaret Ogola",
+  "publicationYear": 1994,
+  "isbn": "9789966467119"
+}
+
+### 2. Add a book
+POST http://localhost:3000/books
+Content-Type: application/json
+
+{
+  "title": "Dust",
+  "author": "Yvonne Adhiambo Owuor",
+  "publicationYear": 2014,
+  "isbn": "9780345802545"
+}
+
+### 3. Add a book
+POST http://localhost:3000/books
+Content-Type: application/json
+
+{
+  "title": "Siku Njema",
+  "author": "Ken Walibora",
+  "publicationYear": 1996,
+  "isbn": "9789966467843"
+}
+
+### 4. Add a book
+POST http://localhost:3000/books
+Content-Type: application/json
+
+{
+  "title": "Weep Not, Child",
+  "author": "Ngugi wa Thiong'o",
+  "publicationYear": 1964,
+  "isbn": "9780143026242"
+}
+
+### 5. Add a book
+POST http://localhost:3000/books
+Content-Type: application/json
+
+{
+  "title": "Sauti ya Dhiki",
+  "author": "Abdilatif Abdalla",
+  "publicationYear": 1973,
+  "isbn": "9789966467256"
+}
+
+### 1. Update book title
+PUT http://localhost:3000/books/1
+Content-Type: application/json
+
+{
+  "title": "The River and the Source (Revised Edition)"
+}
+
+### 2. Update book author
+PUT http://localhost:3000/books/2
+Content-Type: application/json
+
+{
+  "author": "Yvonne A. Owuor"
+}
+
+### 3. Update book publication year
+PUT http://localhost:3000/books/3
+Content-Type: application/json
+
+{
+  "publicationYear": 2000
+}
+
+### 4. Update book ISBN
+PUT http://localhost:3000/books/4
+Content-Type: application/json
+
+{
+  "isbn": "9780143026243"
+}
+
+### 5. Update multiple book fields
+PUT http://localhost:3000/books/5
+Content-Type: application/json
+
+{
+  "title": "Sauti ya Dhiki (New Edition)",
+  "author": "Abdilatif Abdalla",
+  "publicationYear": 1974,
+  "isbn": "9789966467257"
+}
+
+### 1. Delete book with ID = 1
+DELETE http://localhost:3000/books/1
+
+### 2. Delete book with ID = 2
+DELETE http://localhost:3000/books/2
+
+### 3. Delete book with ID = 3
+DELETE http://localhost:3000/books/3
+
+### 4. Delete book with ID = 4
+DELETE http://localhost:3000/books/4
+
+### 5. Delete book with ID = 5
+DELETE http://localhost:3000/books/5
+
+### 1. Search books by title
+GET http://localhost:3000/books/search?title=River
+Accept: application/json
+
+### 2. Search books by title (partial match)
+GET http://localhost:3000/books/search?title=Siku
+Accept: application/json
+
+### 3. Search books by title (case insensitive)
+GET http://localhost:3000/books/search?title=dust
+Accept: application/json
+
+### 4. Search books by title (multiple words)
+GET http://localhost:3000/books/search?title=Weep Not
+Accept: application/json
+
+### 5. Search books by title (no results expected)
+GET http://localhost:3000/books/search?title=NonExistentBookTitle
+Accept: application/json
+
+### 1. Get book counts by year
+GET http://localhost:3000/books/stats/by-year
+Accept: application/json
+
+### 2. Count books for year 1994
+GET http://localhost:3000/books/stats/count/1994
+Accept: application/json
+
+### 3. Count books for year 1996
+GET http://localhost:3000/books/stats/count/1996
+Accept: application/json
+
+### 4. Count books for year 2014
+GET http://localhost:3000/books/stats/count/2014
+Accept: application/json
+
+### 5. Count books for year with no books (1900)
+GET http://localhost:3000/books/stats/count/1900
+Accept: application/json

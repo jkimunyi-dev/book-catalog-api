@@ -11,21 +11,21 @@ export class SearchBooksDto {
   author?: string;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value))
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
   @IsNumber()
   @Min(1000)
   @Max(new Date().getFullYear() + 10)
   publication_year?: number;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value))
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
   @IsNumber()
   @Min(1)
   @Max(100)
   limit?: number = 10;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value))
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
   @IsNumber()
   @Min(0)
   offset?: number = 0;

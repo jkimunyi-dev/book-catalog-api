@@ -266,4 +266,71 @@ export class BooksService {
       throw new DatabaseException('Failed to search books');
     }
   }
+
+  async advancedSearch(searchTerm: string): Promise<Book[]> {
+    try {
+      const query = 'SELECT * FROM search_books($1)';
+      const result = await this.databaseService.query<Book & { rank: number }>(
+        query,
+        [searchTerm],
+      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      return result.rows.map(({ rank, ...book }) => book);
+    } catch (error) {
+      this.logger.error('Error performing advanced search', error);
+      throw new DatabaseException('Failed to search books');
+    }
+  }
+
+  async getBooksByDecade(): Promise<
+    {
+      decade: string;
+      book_count: number;
+      avg_books_per_year: number;
+    }[]
+  > {
+    try {
+      const query = 'SELECT * FROM get_books_by_decade()';
+      const result = await this.databaseService.query<{
+        decade: string;
+        book_count: number;
+        avg_books_per_year: number;
+      }>(query);
+      return result.rows;
+    } catch (error) {
+      this.logger.error('Error getting books by decade', error);
+      throw new DatabaseException('Failed to get book statistics');
+    }
+  }
+
+  async upsertBook(bookData: BookCreateInput & { id?: number }): Promise<Book> {
+    try {
+      const query = 'CALL upsert_book($1, $2, $3, $4, $5)';
+      const values = [
+        bookData.title,
+        bookData.author,
+        bookData.publication_year,
+        bookData.isbn,
+        bookData.id || null,
+      ];
+
+      await this.databaseService.query(query, values);
+
+      // If we have an ID, return the updated book, otherwise get the newly created one
+      if (bookData.id) {
+        return this.findById(bookData.id);
+      } else {
+        // Get the most recently created book with this ISBN
+        const getQuery =
+          'SELECT * FROM books WHERE isbn = $1 ORDER BY created_at DESC LIMIT 1';
+        const result = await this.databaseService.query<Book>(getQuery, [
+          bookData.isbn,
+        ]);
+        return result.rows[0];
+      }
+    } catch (error) {
+      this.logger.error('Error upserting book', error);
+      throw new DatabaseException('Failed to create or update book');
+    }
+  }
 }
